@@ -16,9 +16,7 @@ export default function Home() {
   const videosRef = useRef(null);
   const contactRef = useRef(null);
 
-  const { scrollYProgress } = useScroll();
-  const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.2], [1, 0.8]);
+ 
 
   // Observer for section tracking
   useEffect(() => {
