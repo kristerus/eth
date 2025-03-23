@@ -1,22 +1,22 @@
-// pages/index.js
 'use client'
 import React, { useState, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 
-export default function Home() {
-  const [activeSection, setActiveSection] = useState('hero');
-  const heroRef = useRef(null);
-  const aboutRef = useRef(null);
-  const educationRef = useRef(null);
-  const projectsRef = useRef(null);
-  const skillsRef = useRef(null);
-  const whyEthRef = useRef(null);
-  const videosRef = useRef(null);
-  const contactRef = useRef(null);
+// Define a type for our section IDs to ensure type safety
+type SectionId = 'hero' | 'about' | 'education' | 'projects' | 'skills' | 'whyEth' | 'videos' | 'contact';
 
- 
+export default function Home() {
+  const [activeSection, setActiveSection] = useState<SectionId>('hero');
+  const heroRef = useRef<HTMLElement | null>(null);
+  const aboutRef = useRef<HTMLElement | null>(null);
+  const educationRef = useRef<HTMLElement | null>(null);
+  const projectsRef = useRef<HTMLElement | null>(null);
+  const skillsRef = useRef<HTMLElement | null>(null);
+  const whyEthRef = useRef<HTMLElement | null>(null);
+  const videosRef = useRef<HTMLElement | null>(null);
+  const contactRef = useRef<HTMLElement | null>(null);
 
   // Observer for section tracking
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function Home() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
+            setActiveSection(entry.target.id as SectionId);
           }
         });
       },
@@ -53,11 +53,14 @@ export default function Home() {
     };
   }, []);
 
-  // Scroll to section
-  const scrollToSection = (id) => {
-    document.getElementById(id).scrollIntoView({
-      behavior: 'smooth'
-    });
+  // Scroll to section with type safety
+  const scrollToSection = (id: SectionId) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth'
+      });
+    }
   };
 
   return (
@@ -77,7 +80,7 @@ export default function Home() {
               <span className="text-xl font-bold text-blue-600">Kristian Dhimitri</span>
             </div>
             <div className="hidden md:flex items-center space-x-4">
-              {['hero', 'about', 'projects', 'skills', 'whyEth', 'contact'].map((section) => (
+              {(['hero', 'about', 'projects', 'skills', 'whyEth', 'contact'] as const).map((section) => (
                 <button
                   key={section}
                   onClick={() => scrollToSection(section)}
@@ -106,7 +109,7 @@ export default function Home() {
 
       <main>
         {/* Enhanced Tech-Focused Hero Section */}
-        <section id="hero" ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
+        <section id="hero" ref={heroRef as React.RefObject<HTMLElement>} className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black">
           {/* Animated circuit background */}
           <div className="absolute inset-0 overflow-hidden opacity-40">
             <svg
@@ -342,7 +345,7 @@ export default function Home() {
         </section>
 
         {/* About Section */}
-        <section id="about" ref={aboutRef} className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <section id="about" ref={aboutRef as React.RefObject<HTMLElement>} className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <motion.div 
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -357,8 +360,8 @@ export default function Home() {
                     src="/img.jpeg" 
                     alt="Your Photo" 
                     className="object-cover"
-                    width='600'
-                    height='800'
+                    width={600}
+                    height={800}
                   />
                 </div>
               </div>
@@ -374,172 +377,169 @@ export default function Home() {
           </motion.div>
         </section>
 
-        {/* Education Section */}
-        
-
         {/* Projects Section */}
-        <section id="projects" ref={projectsRef} className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-  <motion.div
-    initial={{ opacity: 0, y: 50 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5 }}
-    viewport={{ once: true, margin: "-100px" }}
-  >
-    <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-blue-600">Key Projects</h2>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {[
-        {
-          title: "SecurePen Framework",
-          description: "Developed a comprehensive penetration testing framework at Fraunhofer SIT with enhanced security features for critical infrastructure systems. Implemented automated vulnerability detection and reporting capabilities.",
-          technologies: ["Python", "Bash", "Docker", "Cybersecurity"]
-        },
-        {
-          title: "Smart Grid Monitoring System",
-          description: "Built a secure IoT-based monitoring solution for electrical grid systems at Wesernetz-SWB. Implemented end-to-end encryption and real-time analytics dashboard for power distribution networks.",
-          technologies: ["IoT", "Azure", "Node.js", "Power Systems"]
-        },
-        {
-          title: "AI-Driven Threat Detection",
-          description: "Created a machine learning system that identifies potential network intrusions with 94% accuracy. Trained on custom datasets and implemented as part of ATHENE Zentrum's cybersecurity research initiative.",
-          technologies: ["TensorFlow", "Python", "Network Security", "AI"]
-        }
-      ].map((project, index) => (
-        <motion.div
-          key={index}
-          className="bg-white rounded-xl shadow-lg overflow-hidden"
-          whileHover={{ y: -10, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
-          transition={{ duration: 0.3 }}
-        >
-          
-          <div className="p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
-            <p className="text-gray-600 mb-4">{project.description}</p>
-            <div className="flex flex-wrap gap-2">
-              {project.technologies.map((tech, techIndex) => (
-                <span key={techIndex} className="inline-block bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">{tech}</span>
+        <section id="projects" ref={projectsRef as React.RefObject<HTMLElement>} className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-blue-600">Key Projects</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                {
+                  title: "SecurePen Framework",
+                  description: "Developed a comprehensive penetration testing framework at Fraunhofer SIT with enhanced security features for critical infrastructure systems. Implemented automated vulnerability detection and reporting capabilities.",
+                  technologies: ["Python", "Bash", "Docker", "Cybersecurity"]
+                },
+                {
+                  title: "Smart Grid Monitoring System",
+                  description: "Built a secure IoT-based monitoring solution for electrical grid systems at Wesernetz-SWB. Implemented end-to-end encryption and real-time analytics dashboard for power distribution networks.",
+                  technologies: ["IoT", "Azure", "Node.js", "Power Systems"]
+                },
+                {
+                  title: "AI-Driven Threat Detection",
+                  description: "Created a machine learning system that identifies potential network intrusions with 94% accuracy. Trained on custom datasets and implemented as part of ATHENE Zentrum's cybersecurity research initiative.",
+                  technologies: ["TensorFlow", "Python", "Network Security", "AI"]
+                }
+              ].map((project, index) => (
+                <motion.div
+                  key={index}
+                  className="bg-white rounded-xl shadow-lg overflow-hidden"
+                  whileHover={{ y: -10, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1)" }}
+                  transition={{ duration: 0.3 }}
+                >
+                  
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{project.title}</h3>
+                    <p className="text-gray-600 mb-4">{project.description}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {project.technologies.map((tech, techIndex) => (
+                        <span key={techIndex} className="inline-block bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-medium">{tech}</span>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
               ))}
             </div>
-          </div>
-        </motion.div>
-      ))}
-    </div>
-  </motion.div>
-</section>
+          </motion.div>
+        </section>
 
         {/* Skills Section */}
-        <section id="skills" ref={skillsRef} className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-gray-100">
-  <motion.div
-    initial={{ opacity: 0, y: 50 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5 }}
-    viewport={{ once: true, margin: "-100px" }}
-  >
-    <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-blue-600">Technical Skills</h2>
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">Programming Languages</h3>
-        <ul className="space-y-3">
-          {['JavaScript', 'Python', 'C++/C#', 'TypeScript', 'SQL'].map((skill) => (
-            <li key={skill} className="flex items-center">
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <motion.div
-                  className="bg-blue-600 h-2.5 rounded-full"
-                  initial={{ width: 0 }}
-                  whileInView={{ width: `${Math.floor(Math.random() * 40) + 60}%` }}
-                  transition={{ duration: 1, delay: 0.1 }}
-                  viewport={{ once: true }}
-                ></motion.div>
+        <section id="skills" ref={skillsRef as React.RefObject<HTMLElement>} className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-gray-100">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-blue-600">Technical Skills</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Programming Languages</h3>
+                <ul className="space-y-3">
+                  {['JavaScript', 'Python', 'C++/C#', 'TypeScript', 'SQL'].map((skill) => (
+                    <li key={skill} className="flex items-center">
+                      <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <motion.div
+                          className="bg-blue-600 h-2.5 rounded-full"
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${Math.floor(Math.random() * 40) + 60}%` }}
+                          transition={{ duration: 1, delay: 0.1 }}
+                          viewport={{ once: true }}
+                        ></motion.div>
+                      </div>
+                      <span className="ml-3 text-gray-700">{skill}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <span className="ml-3 text-gray-700">{skill}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">Cybersecurity & Networks</h3>
-        <ul className="space-y-3">
-          {['Penetration Testing', 'Network Security', 'Azure Cloud Services', 'Linux Administration', 'Security Compliance'].map((skill) => (
-            <li key={skill} className="flex items-center">
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <motion.div
-                  className="bg-blue-600 h-2.5 rounded-full"
-                  initial={{ width: 0 }}
-                  whileInView={{ width: `${Math.floor(Math.random() * 40) + 60}%` }}
-                  transition={{ duration: 1, delay: 0.1 }}
-                  viewport={{ once: true }}
-                ></motion.div>
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Cybersecurity & Networks</h3>
+                <ul className="space-y-3">
+                  {['Penetration Testing', 'Network Security', 'Azure Cloud Services', 'Linux Administration', 'Security Compliance'].map((skill) => (
+                    <li key={skill} className="flex items-center">
+                      <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <motion.div
+                          className="bg-blue-600 h-2.5 rounded-full"
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${Math.floor(Math.random() * 40) + 60}%` }}
+                          transition={{ duration: 1, delay: 0.1 }}
+                          viewport={{ once: true }}
+                        ></motion.div>
+                      </div>
+                      <span className="ml-3 text-gray-700">{skill}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <span className="ml-3 text-gray-700">{skill}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">Web Development</h3>
-        <ul className="space-y-3">
-          {['ReactJS', 'NextJS', 'Node.js', 'GraphQL', 'MongoDB/PostgreSQL'].map((skill) => (
-            <li key={skill} className="flex items-center">
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <motion.div
-                  className="bg-blue-600 h-2.5 rounded-full"
-                  initial={{ width: 0 }}
-                  whileInView={{ width: `${Math.floor(Math.random() * 40) + 60}%` }}
-                  transition={{ duration: 1, delay: 0.1 }}
-                  viewport={{ once: true }}
-                ></motion.div>
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Web Development</h3>
+                <ul className="space-y-3">
+                  {['ReactJS', 'NextJS', 'Node.js', 'GraphQL', 'MongoDB/PostgreSQL'].map((skill) => (
+                    <li key={skill} className="flex items-center">
+                      <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <motion.div
+                          className="bg-blue-600 h-2.5 rounded-full"
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${Math.floor(Math.random() * 40) + 60}%` }}
+                          transition={{ duration: 1, delay: 0.1 }}
+                          viewport={{ once: true }}
+                        ></motion.div>
+                      </div>
+                      <span className="ml-3 text-gray-700">{skill}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <span className="ml-3 text-gray-700">{skill}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-    
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">Electrical Engineering</h3>
-        <ul className="space-y-3">
-          {['Signal Processing', 'Power Systems', 'Electronic Circuits', 'Telecommunications', 'Semiconductor Technology'].map((skill) => (
-            <li key={skill} className="flex items-center">
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <motion.div
-                  className="bg-blue-600 h-2.5 rounded-full"
-                  initial={{ width: 0 }}
-                  whileInView={{ width: `${Math.floor(Math.random() * 40) + 60}%` }}
-                  transition={{ duration: 1, delay: 0.1 }}
-                  viewport={{ once: true }}
-                ></motion.div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Electrical Engineering</h3>
+                <ul className="space-y-3">
+                  {['Signal Processing', 'Power Systems', 'Electronic Circuits', 'Telecommunications', 'Semiconductor Technology'].map((skill) => (
+                    <li key={skill} className="flex items-center">
+                      <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <motion.div
+                          className="bg-blue-600 h-2.5 rounded-full"
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${Math.floor(Math.random() * 40) + 60}%` }}
+                          transition={{ duration: 1, delay: 0.1 }}
+                          viewport={{ once: true }}
+                        ></motion.div>
+                      </div>
+                      <span className="ml-3 text-gray-700">{skill}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <span className="ml-3 text-gray-700">{skill}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-4">Languages & Soft Skills</h3>
-        <ul className="space-y-3">
-          {['German (C1)', 'English (C2)', 'Albanian (Native)', 'French (C1)', 'Problem-Solving'].map((skill) => (
-            <li key={skill} className="flex items-center">
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <motion.div
-                  className="bg-blue-600 h-2.5 rounded-full"
-                  initial={{ width: 0 }}
-                  whileInView={{ width: `${Math.floor(Math.random() * 40) + 60}%` }}
-                  transition={{ duration: 1, delay: 0.1 }}
-                  viewport={{ once: true }}
-                ></motion.div>
+              <div className="bg-white rounded-xl shadow-lg p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Languages & Soft Skills</h3>
+                <ul className="space-y-3">
+                  {['German (C1)', 'English (C2)', 'Albanian (Native)', 'French (C1)', 'Problem-Solving'].map((skill) => (
+                    <li key={skill} className="flex items-center">
+                      <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <motion.div
+                          className="bg-blue-600 h-2.5 rounded-full"
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${Math.floor(Math.random() * 40) + 60}%` }}
+                          transition={{ duration: 1, delay: 0.1 }}
+                          viewport={{ once: true }}
+                        ></motion.div>
+                      </div>
+                      <span className="ml-3 text-gray-700">{skill}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <span className="ml-3 text-gray-700">{skill}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  </motion.div>
-</section>
+            </div>
+          </motion.div>
+        </section>
 
         {/* Why ETH Section */}
-        <section id="whyEth" ref={whyEthRef} className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <section id="whyEth" ref={whyEthRef as React.RefObject<HTMLElement>} className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <motion.div 
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -554,8 +554,8 @@ export default function Home() {
                     src="/eth.jpg" 
                     alt="ETH Zurich Campus" 
                     className="object-cover w-full h-full"
-                    width='800'
-                    height='500'
+                    width={800}
+                    height={500}
                   />
                 </div>
               </div>
@@ -574,7 +574,6 @@ export default function Home() {
             </div>
           </motion.div>
         </section>
-
         {/* Videos Section */}
         
         {/* Contact Section */}
